@@ -8,19 +8,19 @@ from mazelab import MooreMotion
 
 
 def xy_to_flatten_idx(array, x, y):
-    M, N = array.shape
-    return x*N + y
+    m, n = array.shape
+    return x * n + y
 
 
 def flatten_idx_to_xy(array, idx):
-    M, N = array.shape
-    x = idx//N
-    y = idx%N
+    _, n = array.shape
+    x = idx // n
+    y = idx % n
     return np.array([x, y])
 
 
 def make_graph(impassable_array, motions):
-    M, N = impassable_array.shape
+    m, n = impassable_array.shape
     free_idx = np.stack(np.where(np.logical_not(impassable_array)), axis=1)
     row = []
     col = []
@@ -28,11 +28,12 @@ def make_graph(impassable_array, motions):
         node_idx = xy_to_flatten_idx(impassable_array, idx[0], idx[1])
         for motion in motions:
             next_idx = [idx[0] + motion[0], idx[1] + motion[1]]
-            if (next_idx[0] >= 0 and next_idx[0] < M and next_idx[1] >= 0 and next_idx[1] < N) and not impassable_array[next_idx[0], next_idx[1]]:
+            if ((0 <= next_idx[0] < m and 0 <= next_idx[1] < n)
+                    and not impassable_array[next_idx[0], next_idx[1]]):
                 row.append(node_idx)
                 col.append(xy_to_flatten_idx(impassable_array, next_idx[0], next_idx[1]))
     data = [1]*len(row)
-    graph = csr_matrix((data, (row, col)), shape=(M*N, M*N))
+    graph = csr_matrix((data, (row, col)), shape=(m * n, m * n))
     
     return graph
 
@@ -44,7 +45,8 @@ def get_actions(impassable_array, motions, predecessors, start_idx, goal_idx):
     while goal_idx != start_idx:
         if predecessors[goal_idx] == -9999:
             return None
-        action = flatten_idx_to_xy(impassable_array, goal_idx) - flatten_idx_to_xy(impassable_array, predecessors[goal_idx])
+        action = (flatten_idx_to_xy(impassable_array, goal_idx)
+                  - flatten_idx_to_xy(impassable_array, predecessors[goal_idx]))
         for i, motion in enumerate(motions):
             if np.allclose(action, motion):
                 action_idx = i
@@ -59,6 +61,10 @@ def dijkstra_solver(impassable_array, motions, start_idx, goal_idx):
     assert isinstance(motions, (VonNeumannMotion, MooreMotion))
     
     graph = make_graph(impassable_array, motions)
-    dist_matrix, predecessors = dijkstra(csgraph=graph, indices=xy_to_flatten_idx(impassable_array, *start_idx), return_predecessors=True)
+    dist_matrix, predecessors = dijkstra(
+        csgraph=graph,
+        indices=xy_to_flatten_idx(impassable_array, *start_idx),
+        return_predecessors=True
+    )
     actions = get_actions(impassable_array, motions, predecessors, start_idx, goal_idx)
     return actions

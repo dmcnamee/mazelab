@@ -15,25 +15,29 @@ def random_maze(width=81, height=51, complexity=.75, density=.75):
     complexity = int(complexity * (5 * (shape[0] + shape[1])))
     density    = int(density * ((shape[0] // 2) * (shape[1] // 2)))
     # Build actual maze
-    Z = np.zeros(shape, dtype=bool)
+    z = np.zeros(shape, dtype=bool)
     # Fill borders
-    Z[0, :] = Z[-1, :] = 1
-    Z[:, 0] = Z[:, -1] = 1
+    z[0, :] = z[-1, :] = 1
+    z[:, 0] = z[:, -1] = 1
     # Make aisles
     for i in range(density):
         x, y = np.random.randint(0, shape[1]//2 + 1) * 2, np.random.randint(0, shape[0]//2 + 1) * 2
-        Z[y, x] = 1
+        z[y, x] = 1
         for j in range(complexity):
             neighbours = []
-            if x > 1:             neighbours.append((y, x - 2))
-            if x < shape[1] - 2:  neighbours.append((y, x + 2))
-            if y > 1:             neighbours.append((y - 2, x))
-            if y < shape[0] - 2:  neighbours.append((y + 2, x))
+            if x > 1:
+                neighbours.append((y, x - 2))
+            if x < shape[1] - 2:
+                neighbours.append((y, x + 2))
+            if y > 1:
+                neighbours.append((y - 2, x))
+            if y < shape[0] - 2:
+                neighbours.append((y + 2, x))
             if len(neighbours):
-                y_,x_ = neighbours[np.random.randint(0, len(neighbours))]
-                if Z[y_, x_] == 0:
-                    Z[y_, x_] = 1
-                    Z[y_ + (y - y_) // 2, x_ + (x - x_) // 2] = 1
+                y_, x_ = neighbours[np.random.randint(0, len(neighbours))]
+                if z[y_, x_] == 0:
+                    z[y_, x_] = 1
+                    z[y_ + (y - y_) // 2, x_ + (x - x_) // 2] = 1
                     x, y = x_, y_
                     
-    return Z.astype(int)
+    return z.astype(int)
