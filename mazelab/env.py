@@ -55,7 +55,8 @@ class BaseEnv(gym.Env, ABC):
         if mode == 'rgb_array':
             return img
         elif mode == 'human':
-            from gymnasium.envs.classic_control.rendering import SimpleImageViewer
+            # from gymnasium.envs.classic_control.rendering import SimpleImageViewer
+            from .rendering import SimpleImageViewer
             if self.viewer is None:
                 self.viewer = SimpleImageViewer()
             self.viewer.imshow(img)
