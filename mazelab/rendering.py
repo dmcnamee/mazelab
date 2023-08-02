@@ -1,4 +1,5 @@
-# ripped from https://github.com/openai/retro/issues/262
+# solution ripped from https://github.com/openai/retro/issues/262
+# full code for gym.envs.classic_control.rendering.py can be found here https://github.com/openai/gym/releases/tag/v0.21.0
 
 try:
     import pyglet
